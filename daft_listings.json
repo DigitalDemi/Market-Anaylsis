@@ -1,0 +1,674 @@
+[
+  {
+    "title": "25 Obelisk Avenue, Saint Augustine'S Park, Blackrock, Co. Dublin",
+    "price": "\u20ac3,300 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Ennel Court, Ballybrack, Glenageary, Killiney, Co. Dublin",
+    "price": "\u20ac2,400 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "16 The Grove, Kilmartin Grove, Hollystown, Dublin 15",
+    "price": "\u20ac2,850 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "The Lodge, Charleston Avenue, Ranelagh, Dublin 6",
+    "price": "\u20ac5,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Sycamore Court, Carriglea Downs, Kill Avenue, Dun Laoghaire, Co. Dublin",
+    "price": "\u20ac2,397 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Huntstown Rise, Clonsilla, Dublin 15",
+    "price": "\u20ac2,400 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "3 Bed House, Casino Road, Dublin 3, Marino, Dublin 3",
+    "price": "\u20ac2,900 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Castlecurragh Vale, Mulhuddart, Dublin 15",
+    "price": "\u20ac2,800 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Barnageeragh Cove, Skerries, Co. Dublin",
+    "price": "\u20ac2,600 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "5 Danes Court, Lusk, Co. Dublin",
+    "price": "\u20ac2,750 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "34 Ashley Avenue, Swords, Co. Dublin",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "35 Waterside Walk, Swords Road, Malahide, Co. Dublin",
+    "price": "\u20ac2,632 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "28 Red Arches Drive, The Coast, Baldoyle, Dublin 13",
+    "price": "\u20ac2,800 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "29 Cowper Downs, Rathmines, Dublin 6",
+    "price": "\u20ac3,815 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Cherrywood Villas, Dublin 22, Grange Castle, Co. Dublin",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": " Fortfield Square, Dublin 6w, Templeogue, Dublin 6W",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Glencairn Thicket, Leopardstown, Dublin 18",
+    "price": "\u20ac2,180 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Collins Avenue, Whitehall, Dublin 9",
+    "price": "\u20ac3,114 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "15 Grange Terrace, Deansgrange, Blackrock, Co. Dublin",
+    "price": "\u20ac3,100 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "68 Saint Assam'S Park, Dublin 5, Raheny, Dublin 5",
+    "price": "\u20ac2,300 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "14 Eden Park Drive, Goatstown, Dublin 14",
+    "price": "\u20ac3,320 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Cherry Orchard Crescent, Cherry Orchard, Dublin 10",
+    "price": "\u20ac2,200 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Riverwood Square, Caslteknock, Castleknock, Dublin 15",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Cherrywood Grove, Clondalkin, Dublin 22",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Patrician Villas, Stillorgan, Co. Dublin",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Monastery Gate Close, Clondalkin, Dublin 22",
+    "price": "\u20ac2,058 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Church View, Rathcoole, Co. Dublin",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Newcastle Manor Square Newcastle, Newcastle, Co. Dublin",
+    "price": "\u20ac2,650 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Cherrywood Grove, Clondalkin, Dublin 22",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Magenta Crescent, Santry, Dublin 9",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Barnhill Road, Dalkey, Co. Dublin",
+    "price": "\u20ac3,200 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Clogher Road, Crumlin, Dublin 12",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Rathlawns, Rathcoole, Co. Dublin",
+    "price": "\u20ac2,348 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Carrigmore Avenue, Citywest, Co. Dublin",
+    "price": "\u20ac2,348 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "The Crescent, Millbrook Lawns, Tallaght, Dublin 24",
+    "price": "\u20ac1,387 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Graydon Crescent, Newcastle, Co. Dublin",
+    "price": "\u20ac2,900 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "44 Belarmine Grove, Dublin 18, Stepaside, Dublin 18",
+    "price": "\u20ac2,995 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "7 Larkfield Glade, Dublin 18, Leopardstown, Dublin 18",
+    "price": "\u20ac3,195 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Holywell, Kilmacud Road Upper, Kilmacud, Co. Dublin",
+    "price": "\u20ac3,300 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": " Jalna, 15 Kilbarrack road, Raheny, Dublin 5",
+    "price": "\u20ac3,145 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Merrion Park, South Hill Avenue, Blackrock, Co. Dublin",
+    "price": "\u20ac3,300 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Priory Grove, Stillorgan, Co. Dublin",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Knapton Court, York Road, Dun Laoghaire, Co. Dublin",
+    "price": "\u20ac2,905 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "De Courcey Square, Glasnevin, Dublin 9",
+    "price": "\u20ac2,900 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Glencloy Road, Whitehall, Santry, Dublin 9",
+    "price": "\u20ac3,350 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Glencloy Road, Whitehall, Santry, Dublin 9",
+    "price": "\u20ac3,360 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Hearse Road, Lanistown, Donabate, Co. Dublin",
+    "price": "\u20ac1,599 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Boroimhe Blackthorn, Swords, Co. Dublin",
+    "price": "\u20ac2,300 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Pinewood Avenue, Glasnevin, Dublin 11",
+    "price": "\u20ac2,800 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Millmount Avenue, Dublin 9, Drumcondra, Dublin 9",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "52 Latchford Park, Castaheany, Clonee, Dublin 15",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "4 Ballintyre Downs, Ballinteer, Dublin 16",
+    "price": "\u20ac2,436 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "19 Donnybrook Manor, Donnybrook, Dublin 4",
+    "price": "\u20ac3,250 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "28 Shrewsbury, Ballsbridge, Dublin 4",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Rivermeade Park, Saint Margaret's, St Margaret's, Co. Dublin",
+    "price": "\u20ac2,300 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Castlegate Park, Adamstown, Co. Dublin",
+    "price": "\u20ac2,600 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Gandon Walk, Lucan, Co. Dublin",
+    "price": "\u20ac2,850 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Templeville Road, Templeogue, Templeogue, Dublin 6W",
+    "price": "\u20ac2,700 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "27 Walkinstown Parade, Walkinstown, Walkinstown, Dublin 12",
+    "price": "\u20ac2,820 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "4 Ballymoss Parade, The Chase, Stillorgan, Co. Dublin",
+    "price": "\u20ac2,260 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "The Rise, St Marnock's Bay, Portmarnock, Co. Dublin",
+    "price": "\u20ac3,075 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Apartment 41 , The Weir, Chapelizod, Dublin 20",
+    "price": "\u20ac3,153 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Eblana villa, Dublin 2",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Kingswood Heights,Dublin 24, Kilnamanagh, Dublin 24",
+    "price": "\u20ac3,200 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Cherrywood Park, Shankill, Dublin 18, Laughanstown, Co. Dublin",
+    "price": "\u20ac3,700 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "50 Viking Road, Arbour Hill, Dublin 7",
+    "price": "\u20ac2,700 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "39 Brookwood Heights, Dublin 5, Artane, Dublin 5",
+    "price": "\u20ac2,995 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "45 Cedarmount Road, Mount Merrion, Co. Dublin",
+    "price": "\u20ac3,400 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Shrewsbury,Dublin 4, Dublin 4",
+    "price": "\u20ac4,000 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "17 Silver Pines, Stillorgan, Stillorgan, Co. Dublin",
+    "price": "\u20ac3,250 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Castleland Park View,Balbriggan,Co. Dublin, Balbriggan, Co. Dublin",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": " Bealing Crescent, Bealing Village, Tyrrelstown, Dublin 15",
+    "price": "\u20ac2,205 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "11 Scholarstown Park, Rathfarnham, Dublin 16",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "4 Bay Meadows View, Hollystown, Dublin 15",
+    "price": "\u20ac2,662 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "4 Bay Meadows View, Hollystown, Dublin 15",
+    "price": "\u20ac2,662 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "16 Talavera House, Myrtle Square, Baldoyle, Dublin 13",
+    "price": "\u20ac2,775 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "36c Thornville Road,Dublin 5, Kilbarrack, Dublin 5",
+    "price": "\u20ac2,799 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Gracelands, Saint Kevin'S Gardens, Dartry, Dublin 6",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Heather Park, Rathfarnham, Dublin 16",
+    "price": "\u20ac2,900 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Thormanby Grove, Saint Mary's Place, Howth, Dublin 13",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "18 Northbrook Avenue, Dublin 6, Ranelagh, Dublin 6",
+    "price": "\u20ac3,850 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "77 Glenaulin Green, Dublin 20, Palmerstown, Dublin 20",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Hildan guest House, Lispopple, Kilsallaghan, Co. Dublin",
+    "price": "\u20ac250 per week",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Donnybrook Village, Donnybrook, Dublin 4",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Glen Lawn Drive, The Park, Cabinteely, Dublin 18",
+    "price": "\u20ac2,950 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "17 MAPLE MANOR, UNFURNISHED HOUSE WITH ATTIC CONVERSION / HOME OFFICE, Cabinteely, Dublin 18",
+    "price": "\u20ac3,200 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "COPPINGER GLADE UNFURNISHED HOUSE WITH ATTIC CONVERSION / HOME OFFICE, Stillorgan, Co. Dublin",
+    "price": "\u20ac3,200 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": " Bunbury Gate , Swords, Co. Dublin, Swords, Co. Dublin",
+    "price": "\u20ac2,950 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "19 Coill Dubh Avenue, Broomfield, Malahide, Co. Dublin",
+    "price": "\u20ac2,680 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "2 Abby Well, Chapel Road, Malahide, Co. Dublin",
+    "price": "\u20ac2,850 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Woodlands Avenue, Glenageary, Co. Dublin",
+    "price": "\u20ac2,900 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "74 Russell Avenue, Dublin 3, Drumcondra, Dublin 3",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "South Park Drive, Foxrock, Dublin 18",
+    "price": "\u20ac3,850 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Richmond Cottages North,Dublin 1, Ballybough, Dublin 3",
+    "price": "\u20ac2,288 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "16 Woodlawn Crescent",
+    "price": "\u20ac3,030 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "27 Church Road, Dalkey, Co. Dublin",
+    "price": "\u20ac3,750 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Heyward Mews , Roganstown , Swords Co Dublin, Swords, Co. Dublin",
+    "price": "\u20ac2,750 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Shandon Mews, Shandon Park, Phibsborough, Dublin 7",
+    "price": "\u20ac4,000 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Crannagh, Milltown, Dublin 6",
+    "price": "\u20ac3,120 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Curzon Street, Dublin 8, Portobello, Dublin 8",
+    "price": "\u20ac3,408 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "16 Cruagh Rise, Dublin 18, Stepaside, Dublin 18",
+    "price": "\u20ac3,000 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Off Newtownpark avenue , Blackrock, Co. Dublin",
+    "price": "\u20ac3,100 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Edward Place, Bloomfield Avenue, Donnybrook, Dublin 4",
+    "price": "\u20ac5,990 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "71 Hazel Road, Donnycarney, Dublin 3",
+    "price": "\u20ac2,700 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "111 Sutton Park, Sutton, Bayside, Dublin 13",
+    "price": "\u20ac2,150 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Rochestown Avenue, Dun Laoghaire, Co. Dublin",
+    "price": "\u20ac2,769 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "Belmont Park, Dublin 5, Raheny, Dublin 5",
+    "price": "\u20ac2,750 per month",
+    "beds": "3 Bed",
+    "baths": "1 Bath"
+  },
+  {
+    "title": "Alexandra Terrace, Dundrum Road, Dundrum, Dublin 14",
+    "price": "\u20ac3,500 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "16 Grange Manor Drive, Rathfarnham, Dublin 16",
+    "price": "\u20ac2,100 per month",
+    "beds": "3 Bed",
+    "baths": "3 Bath"
+  },
+  {
+    "title": "Arboria, Mountpelier, Bohernabreena, Co. Dublin",
+    "price": "\u20ac2,500 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "30 Shoreside Park, Sea Gardens, Bray, Co. Wicklow",
+    "price": "\u20ac3,250 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  },
+  {
+    "title": "3 Bedroom House, Jameson Orchard, Jameson Orchard Road, Malahide, Co. Dublin",
+    "price": "\u20ac2,759 per month",
+    "beds": "3 Bed",
+    "baths": "2 Bath"
+  }
+]
