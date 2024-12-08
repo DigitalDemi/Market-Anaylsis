@@ -6,6 +6,7 @@ from src.utils.filter import DataFilter
 import json
 from src.urls import daft
 from typing import List, Dict, Tuple
+from dataclasses import dataclass
 # from src.urls import daft 
 
 #TODO: Time to do property tommrow
@@ -13,28 +14,113 @@ from typing import List, Dict, Tuple
 # Need to pull the information from somewhere, different between worldcitydb and wikipidia
 if __name__ == "__main__":
 
-    # Initialize parser with initial Daft URL to get total results
-    initial_url = "https://www.daft.ie/property-for-rent/dublin/houses"
-    parser = Parser(url=initial_url)
+    @dataclass
+    class PaginationConfig:
+        pagination_div: str
+        page_selector: str
 
-    try:
-        parser.getScript()
-        total_results = parser.values['props']['pageProps']['paging']['totalResults']
-        print(f"Found {total_results} total listings")
-        
-        parser.set_url_constructor(daft.draft)
-        results = parser.process_urls(total_results)
-        
-        output_file = "daft_listings.json"
-        with open(output_file, "w") as f:
-            json.dump(results, f, indent=2)
-        
-        print(f"Successfully saved {len(results)} listings to {output_file}")
-        
-    except Exception as e:
-        print(f"Error during scraping: {e}")
+    pagination_config = PaginationConfig(
+        pagination_div='div#pages',
+        page_selector='a[title^="Page"]'
+    )
 
+    script_parser = Parser(
+        url="https://www.daft.ie/property-for-rent/dublin/houses?pageSize=20",
+        parse_type='script'
+    )
 
+    results = script_parser.main()
+    script_parser.save_json(results, "daft.json")
+
+    pagination_config = PaginationConfig(
+        page_selector='a[title^="Page"]',  
+        pagination_div='div#pages',  
+    )
+
+    html_parser = Parser(
+            url='https://www.property.ie/property-to-let/dublin/price_international_rental-onceoff_standard/',
+            parse_type='html',
+            selectors = {
+    'parent': '.search_result',  
+    'ber': {
+        'selector': '.ber-search-results img',
+        'attribute': 'src'
+    },
+    'address': {
+        'selector': '.sresult_address h2 a',
+        'attribute': 'text'
+    },
+    'url': {
+        'selector': '.sresult_address h2 a',
+        'attribute': 'href'
+    },
+    'image': {
+        'selector': 'img.thumb',
+        'attribute': 'src'
+    },
+    'price': {
+        'selector': '.sresult_description h3',
+        'attribute': 'text'
+    },
+    'details': {
+        'selector': '.sresult_description h4',
+        'attribute': 'text'
+    },
+    'availability': {
+        'selector': '.sresult_available_from',
+        'attribute': 'text'
+    },
+    'description': {
+        'selector': '.sresult_description p',
+        'attribute': 'text'
+    }
+},
+            filename="property.json",
+            pagination_config=pagination_config
+    
+    )
+
+    results = html_parser.process_all_pages()
+    html_parser.save_json(results, "property_all.json")
+
+    selectors = {
+    'parent': '.search_result',
+    'address': {
+        'selector': '.sresult_address h2 a', 
+        'attribute': 'text'
+    },
+    'url': {
+        'selector': '.sresult_address h2 a', 
+        'attribute': 'href'
+    },
+    'ber': {
+        'selector': '.ber-search-results img',
+        'attribute': 'src'
+    },
+    'image': {
+        'selector': 'img.sresult_thumb',
+        'attribute': 'src'
+    },
+    'details': {
+        'selector': '.sresult_description',
+        'attribute': 'text'
+    }
+}
+
+    pagination_config = PaginationConfig(
+        pagination_div='div#pages',
+        page_selector='a[title^="Page"]'  
+    )
+
+    parser = Parser(
+        url="https://www.rent.ie/houses-to-let/renting_dublin/",
+        filename="dublin_rentals.json",
+        parse_type='html',
+        selectors=selectors,
+        pagination_config=pagination_config
+    )
+
+    parser.save_json(results, "dublin_rentals.json")
 
     api = Api(
         base_api_url="https://api.myhome.ie/search",  
