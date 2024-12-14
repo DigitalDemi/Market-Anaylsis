@@ -1,35 +1,57 @@
-#![feature(random)]
-use std::io;
+use axum::{
+    routing::{get, post},
+    http::StatusCode,
+    Json, Router,
+};
+use serde::{Deserialize, Serialize};
 
-use std::random::random;
+#[tokio::main]
+async fn main() {
+    // initialize tracing
+    tracing_subscriber::fmt::init();
 
-fn main() {
-    println!("Guess the number");
-    println!("Please input your guess.");
+    // build our application with a route
+    let app = Router::new()
+        // `GET /` goes to `root`
+        .route("/", get(root))
+        // `POST /users` goes to `create_user`
+        .route("/users", post(create_user));
 
-    let n = (random::<u32>() % 100) + 1;
+    // run our app with hyper, listening globally on port 3000
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
+}
 
-    println!("Debug Guessing: {}", n);
+// basic handler that responds with a static string
+async fn root() -> &'static str {
+    "Hello, World!"
+}
 
-    let mut int_guess: u32 = 0;
+async fn create_user(
+    // this argument tells axum to parse the request body
+    // as JSON into a `CreateUser` type
+    Json(payload): Json<CreateUser>,
+) -> (StatusCode, Json<User>) {
+    // insert your application logic here
+    let user = User {
+        id: 1337,
+        username: payload.username,
+    };
 
-    while n != int_guess {
+    // this will be converted into a JSON response
+    // with a status code of `201 Created`
+    (StatusCode::CREATED, Json(user))
+}
 
-    let mut guess = String::new();
+// the input to our `create_user` handler
+#[derive(Deserialize)]
+struct CreateUser {
+    username: String,
+}
 
-    io::stdin()
-        .read_line(&mut guess)
-        .expect("Failed to read lines");
-
-    int_guess = guess
-        .trim()
-        .parse()
-        .expect("Failed to parse number");
-
-        println!("Sorry you were wrong");
-    }
-        
-
-    println!("Hey you guess it correct");
-    println!("You guessed: {}", int_guess);
+// the output to our `create_user` handler
+#[derive(Serialize)]
+struct User {
+    id: u64,
+    username: String,
 }
