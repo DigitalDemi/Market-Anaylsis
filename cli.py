@@ -93,3 +93,19 @@ def handle_query(args):
     )
 
     display_results(df, args.source)
+
+def main():
+    parser = setup_parser()
+    args = parser.parse_args()
+
+    try:
+        if args.action == 'collect':
+            asyncio.run(collect_data(debug=args.debug))
+        elif args.action == 'query':
+            handle_query(args)
+    except Exception as e:
+        logger.error(f"Error in main: {str(e)}", exc_info=True)
+        raise
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import aiohttp
 import aiofiles
 from typing import List, Dict, Any, Optional
@@ -8,9 +9,10 @@ import logging
 import pandas as pd
 import json
 from dataclasses import dataclass
-from .parse import AsyncParser
+from .parse import AsyncParser, PaginationConfig
 from .api import AsyncApi
-from src.urls.daft import DAFT_CONFIG
+
+logger = logging.getLogger(__name__)
 
 def create_directory_path(base_path: Path, source: str, date: datetime) -> Path:
     """Create hierarchical directory path"""
@@ -30,31 +32,42 @@ class AsyncDataLakeManager:
         
         for path in [self.raw_path, self.processed_path]:
             path.mkdir(parents=True, exist_ok=True)
-    
+
+
     async def store_raw(self, data: Any, source: str) -> Path:
         """Store raw data asynchronously"""
+        logger.debug(f"Storing raw data for source: {source}")
         timestamp = datetime.now()
         directory = create_directory_path(self.raw_path, source, timestamp)
         directory.mkdir(parents=True, exist_ok=True)
         
         filepath = directory / f"{source}_{timestamp.strftime('%H%M%S')}.json"
+        logger.debug(f"Writing raw data to: {filepath}")
+        
         async with aiofiles.open(filepath, 'w') as f:
-            await f.write(json.dumps(data))
+            await f.write(json.dumps(data, indent=2))
+        logger.info(f"Stored raw data at: {filepath}")
         return filepath
 
     async def process_and_store(self, raw_filepath: Path, source: str) -> Optional[Path]:
         """Process and store data asynchronously"""
+        logger.debug(f"Processing data from: {raw_filepath}")
         try:
             async with aiofiles.open(raw_filepath) as f:
                 content = await f.read()
                 raw_data = json.loads(content)
             
+            if not raw_data:
+                logger.warning(f"No data found in {raw_filepath}")
+                return None
+
+            logger.debug(f"Raw data keys: {list(raw_data[0].keys()) if isinstance(raw_data, list) else 'Not a list'}")
+            
             loop = asyncio.get_event_loop()
-            processed_df = await loop.run_in_executor(
-                None, 
-                pd.DataFrame, 
-                raw_data
-            )
+            processed_df = await loop.run_in_executor(None, pd.DataFrame, raw_data)
+            
+            logger.debug(f"Processed DataFrame columns: {processed_df.columns.tolist()}")
+            logger.debug(f"Processed DataFrame shape: {processed_df.shape}")
             
             timestamp = datetime.now()
             proc_dir = create_directory_path(self.processed_path, source, timestamp)
@@ -68,10 +81,11 @@ class AsyncDataLakeManager:
                 proc_filepath
             )
             
+            logger.info(f"Stored processed data at: {proc_filepath}")
             return proc_filepath
             
         except Exception as e:
-            logging.error(f"Error processing data for {source}: {str(e)}")
+            logger.error(f"Error processing data for {source}: {str(e)}", exc_info=True)
             return None
 
 class AsyncHousingCollector:
@@ -89,12 +103,12 @@ class AsyncHousingCollector:
             await self.session.close()
 
     def _initialize_scrapers(self) -> Dict[str, ScraperConfig]:
-        """Initialize scraper configurations"""
+        from src.urls.daft import DaftAsyncScraper
         return {
             'daft': ScraperConfig(
                 name='daft',
-                scraper_class=AsyncParser,
-                scraper_args=DAFT_CONFIG
+                scraper_class=DaftAsyncScraper,
+                scraper_args={}
             ),
             'property': ScraperConfig(
                 name='property',
@@ -106,7 +120,10 @@ class AsyncHousingCollector:
                         'parent': '.search_result',
                         'address': {'selector': '.sresult_address h2 a', 'attribute': 'text'},
                         'price': {'selector': '.sresult_description h3', 'attribute': 'text'}
-                    }
+                    },
+                    'pagination_config': PaginationConfig(
+                        page_selector='a[href*="p_"]'  # Finds links containing p_ in href
+                    )
                 }
             ),
             'myhome': ScraperConfig(
@@ -122,29 +139,39 @@ class AsyncHousingCollector:
         }
 
     async def collect_source(self, source: str) -> Optional[Path]:
-        """Collect data from a specific source asynchronously"""
+        """Collect data from a specific source asynchronously."""
+        logger.info(f"Starting collection for source: {source}")
         try:
             config = self.scrapers.get(source)
             if not config:
                 raise ValueError(f"Unknown source: {source}")
-            
+
+            if source == "daft":
+                from src.urls.daft import DaftAsyncScraper
+                scraper = DaftAsyncScraper(data_lake=self.data_lake)
+                return await scraper.main()
+
             scraper = config.scraper_class(session=self.session, **config.scraper_args)
-            
+
             if isinstance(scraper, AsyncApi):
+                logger.debug(f"Using AsyncApi for {source}")
                 data = await scraper.get_data(page_size=20)
             else:
+                logger.debug(f"Using AsyncParser for {source}")
                 data = await scraper.main()
-                
+
             if not data:
-                logging.warning(f"No data retrieved from {source}")
+                logger.warning(f"No data retrieved from {source}")
                 return None
-                
+
+            logger.debug(f"Retrieved {len(data)} records from {source}")
             raw_path = await self.data_lake.store_raw(data, source)
             return await self.data_lake.process_and_store(raw_path, source)
-            
+
         except Exception as e:
-            logging.error(f"Error collecting from {source}: {str(e)}", exc_info=True)
+            logger.error(f"Error collecting from {source}: {str(e)}", exc_info=True)
             return None
+
 
     async def collect_all(self) -> Dict[str, Optional[Path]]:
         """Collect from all sources asynchronously"""
