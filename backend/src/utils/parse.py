@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PaginationConfig:
     page_selector: str
-    url_pattern: str = 'p_'  # Pages are formatted as p_1, p_2, etc.
+    url_pattern: str = 'p_'  
 
 class AsyncParser:
     def __init__(
