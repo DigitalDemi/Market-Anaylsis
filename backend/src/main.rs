@@ -606,6 +606,42 @@ fn parse_daft_row(row: &parquet::record::Row) -> Option<StandardizedProperty> {
     })
 }
 
+#[cfg(test)]
+mod tests{
+    // Using AAA for testing
+    // assert -> true
+    // assert eq -> left = right
+    // assert ne -> left != right
+    // partionaleq and debug
+    use reqwest::{Client, Url};
+    const BASE_URL: &str = "http://localhost:3000";
+    const BASE_PATH: &str = "housing_data";
+
+    #[tokio::test]
+    async fn check_connection() -> Result<(), Box<dyn std::error::Error>>{
+        let client = Client::new();
+        let url = Url::parse(BASE_URL)?.join("/health")?;
+
+        let response = client
+            .get(url)
+            .send()
+            .await?;
+    
+        assert_eq!(response.status(), 200);
+        let body = response.text().await?;
+        assert_eq!(body, "OK");
+
+        Ok(())
+        
+    }
+    #[test]
+    fn does_directory_exsits(){
+        use std::path::Path;
+        let path = Path::new(BASE_PATH);
+        assert!(path.exists());
+    }
+
+}
    
 
 #[tokio::main]
