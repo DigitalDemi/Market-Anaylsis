@@ -632,11 +632,11 @@ mod tests{
         assert_eq!(body, "OK");
 
         Ok(())
-        
     }
     #[test]
     fn does_directory_exsits(){
         use std::path::Path;
+
         let path = Path::new(BASE_PATH);
         assert!(path.exists());
     }
