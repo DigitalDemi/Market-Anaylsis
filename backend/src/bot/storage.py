@@ -8,30 +8,37 @@ auth_id = {
 
 PATH = './settings'
 
-def create_path(path):
+def soft_assert(condition: bool, message: str) -> bool:
+    """Log instead of raising assertion."""
+    if condition:
+        logging.info(f"Assertion passed: {message}")
+        return True
+    logging.error(f"Assertion failed: {message}")
+    return False
+
+def create_path(path: Path) -> bool:
+    if not soft_assert(path is not None, "Path cannot be None"):
+        return False
+        
     try:
         path.mkdir(exist_ok=False)
-    except FileExistsError as e:
-        logging.info(f"Path already exists: {path} : {e}")
-        raise
+        return soft_assert(path.exists(), f"Created path: {path}")
+    except FileExistsError:
+        logging.info(f"Path exists: {path}")
+        return False
+    except Exception as e:
+        logging.error(f"Failed to create path: {e}")
+        return False
 
-
-def check_if_path_exists(path):
-    logging.info(f"Checking if path exsists")
-    valid = Path.exists(path)
-    try:
-        assert valid, f"Path, {path} does not exists"
-    except AssertionError as e:
-        logging.error(str(e))
-    if not valid: 
-        logging.warning(f"Path does not exist. Creating: {path}")
-        try: 
-            create_path(path)
-        except Exception as e:
-            logging.warning(f"Failed to create path: {e}")
-            raise
-
-
+def check_path(path: Path, create_if_missing: bool = True) -> bool:
+    if not soft_assert(path is not None, "Path cannot be None"):
+        return False
+    
+    if not path.exists():
+        logging.warning(f"Path missing: {path}")
+        return create_path(path) if create_if_missing else False
+    
+    return soft_assert(path.is_dir(), f"Path {path} must be a directory")
 
 
 
@@ -40,7 +47,7 @@ def check_if_path_exists(path):
 # def check_if_file_exsits():
 #     for i in auth_id:
 if __name__ == '__main__':
-    check_if_path_exists(Path(PATH))
+    check_path(Path(PATH))
 
 
 
