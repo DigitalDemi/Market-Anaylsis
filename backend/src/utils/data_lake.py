@@ -29,7 +29,7 @@ class AsyncDataLakeManager:
         self.base_path = Path(base_path)
         self.raw_path = self.base_path / "raw"
         self.processed_path = self.base_path / "processed"
-        
+
         for path in [self.raw_path, self.processed_path]:
             path.mkdir(parents=True, exist_ok=True)
 
@@ -40,10 +40,10 @@ class AsyncDataLakeManager:
         timestamp = datetime.now()
         directory = create_directory_path(self.raw_path, source, timestamp)
         directory.mkdir(parents=True, exist_ok=True)
-        
+
         filepath = directory / f"{source}_{timestamp.strftime('%H%M%S')}.json"
         logger.debug(f"Writing raw data to: {filepath}")
-        
+
         async with aiofiles.open(filepath, 'w') as f:
             await f.write(json.dumps(data, indent=2))
         logger.info(f"Stored raw data at: {filepath}")
@@ -56,34 +56,34 @@ class AsyncDataLakeManager:
             async with aiofiles.open(raw_filepath) as f:
                 content = await f.read()
                 raw_data = json.loads(content)
-            
+
             if not raw_data:
                 logger.warning(f"No data found in {raw_filepath}")
                 return None
 
             logger.debug(f"Raw data keys: {list(raw_data[0].keys()) if isinstance(raw_data, list) else 'Not a list'}")
-            
+
             loop = asyncio.get_event_loop()
             processed_df = await loop.run_in_executor(None, pd.DataFrame, raw_data)
-            
+
             logger.debug(f"Processed DataFrame columns: {processed_df.columns.tolist()}")
             logger.debug(f"Processed DataFrame shape: {processed_df.shape}")
-            
+
             timestamp = datetime.now()
             proc_dir = create_directory_path(self.processed_path, source, timestamp)
             proc_dir.mkdir(parents=True, exist_ok=True)
-            
+
             proc_filepath = proc_dir / f"{source}_{timestamp.strftime('%H%M%S')}.parquet"
-            
+
             await loop.run_in_executor(
-                None,
-                processed_df.to_parquet,
-                proc_filepath
-            )
-            
+                    None,
+                    processed_df.to_parquet,
+                    proc_filepath
+                    )
+
             logger.info(f"Stored processed data at: {proc_filepath}")
             return proc_filepath
-            
+
         except Exception as e:
             logger.error(f"Error processing data for {source}: {str(e)}", exc_info=True)
             return None
@@ -93,11 +93,11 @@ class AsyncHousingCollector:
         self.data_lake = data_lake
         self.scrapers = self._initialize_scrapers()
         self.session = None
-    
+
     async def __aenter__(self):
         self.session = aiohttp.ClientSession()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self.session:
             await self.session.close()
@@ -105,38 +105,39 @@ class AsyncHousingCollector:
     def _initialize_scrapers(self) -> Dict[str, ScraperConfig]:
         from src.urls.daft import DaftAsyncScraper
         return {
-            'daft': ScraperConfig(
-                name='daft',
-                scraper_class=DaftAsyncScraper,
-                scraper_args={}
-            ),
-            'property': ScraperConfig(
-                name='property',
-                scraper_class=AsyncParser,
-                scraper_args={
-                    'url': 'https://www.property.ie/property-to-let/dublin/',
-                    'parse_type': 'html',
-                    'selectors': {
-                        'parent': '.search_result',
-                        'address': {'selector': '.sresult_address h2 a', 'attribute': 'text'},
-                        'price': {'selector': '.sresult_description h3', 'attribute': 'text'}
-                    },
-                    'pagination_config': PaginationConfig(
-                        page_selector='a[href*="p_"]'  # Finds links containing p_ in href
+                'daft': ScraperConfig(
+                    name='daft',
+                    scraper_class=DaftAsyncScraper,
+                    scraper_args={}
+                    ),
+                'property': ScraperConfig(
+                    name='property',
+                    scraper_class=AsyncParser,
+                    scraper_args={
+                        'url': 'https://www.property.ie/property-to-let/dublin/',
+                        'parse_type': 'html',
+                        'selectors': {
+                            'parent': '.search_result',
+                            'address': {'selector': '.sresult_address h2 a', 'attribute': 'text'},
+                            'price': {'selector': '.sresult_description h3', 'attribute': 'text'},
+                            'id': {'selector': '.sresult_address h2 a', 'attribute': 'href', 'transform': lambda x: x.split('/')[-1]}
+                            },
+                        'pagination_config': PaginationConfig(
+                            page_selector='a[href*="p_"]'
+                            )
+                        }
+                    ),
+                'myhome': ScraperConfig(
+                    name='myhome',
+                    scraper_class=AsyncApi,
+                    scraper_args={
+                        'base_api_url': "https://api.myhome.ie/search",
+                        'payload_api_url': "https://www.myhome.ie/rentals/dublin/property-to-rent",
+                        'api_key': "4284149e-13da-4f12-aed7-0d644a0b7adb",
+                        'correlation_id': "22fade32-8266-4c26-9ea7-6aa470a30f07"
+                        }
                     )
                 }
-            ),
-            'myhome': ScraperConfig(
-                name='myhome',
-                scraper_class=AsyncApi,
-                scraper_args={
-                    'base_api_url': "https://api.myhome.ie/search",
-                    'payload_api_url': "https://www.myhome.ie/rentals/dublin/property-to-rent",
-                    'api_key': "4284149e-13da-4f12-aed7-0d644a0b7adb",
-                    'correlation_id': "22fade32-8266-4c26-9ea7-6aa470a30f07"
-                }
-            )
-        }
 
     async def collect_source(self, source: str) -> Optional[Path]:
         """Collect data from a specific source asynchronously."""
@@ -176,8 +177,8 @@ class AsyncHousingCollector:
     async def collect_all(self) -> Dict[str, Optional[Path]]:
         """Collect from all sources asynchronously"""
         tasks = [
-            self.collect_source(source)
-            for source in self.scrapers.keys()
-        ]
+                self.collect_source(source)
+                for source in self.scrapers.keys()
+                ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return dict(zip(self.scrapers.keys(), results))

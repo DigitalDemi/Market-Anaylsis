@@ -1,4 +1,5 @@
 import logging
+import re
 import aiohttp
 import asyncio
 from typing import Dict, List, Optional, Tuple
@@ -19,27 +20,27 @@ class PropertyAlertManager:
     def __init__(self, api_base_url: str = "http://127.0.0.1:3000"):
         self.api_base_url = api_base_url
         self.sources = {
-            'daft': PropertySource(
-                name='daft',
-                display_name='Daft.ie',
-                aliases=['daft', 'daft.ie', 'daftie'],
-                base_url='https://www.daft.ie',
-                url_pattern='https://www.daft.ie/for-rent/{}/{}',
-            ),
-            'myhome': PropertySource(
+                'daft': PropertySource(
+                    name='daft',
+                    display_name='Daft.ie',
+                    aliases=['daft', 'daft.ie', 'daftie'],
+                    base_url='https://www.daft.ie',
+                    url_pattern='https://www.daft.ie/for-rent/{}/{}',
+                    ),
+                'myhome': PropertySource(
                 name='myhome',
                 display_name='MyHome.ie',
                 aliases=['myhome', 'myhome.ie', 'my home'],
                 base_url='https://www.myhome.ie',
-                url_pattern='https://www.myhome.ie/rental/details/{}',
+                url_pattern='https://www.myhome.ie/rentals/brochure/{}/{}',
             ),
-            'property': PropertySource(
-                name='property',
-                display_name='Property.ie',
-                aliases=['property', 'property.ie', 'propertyie'],
-                base_url='https://www.property.ie',
-                url_pattern='https://www.property.ie/property-to-rent/{}/{}',
-            )
+                'property': PropertySource(
+                    name='property',
+                    display_name='Property.ie',
+                    aliases=['property', 'property.ie', 'propertyie'],
+                    base_url='https://www.property.ie',
+                    url_pattern='https://www.property.ie/property-to-let/{}/{}'  # Modified to handle name/id format
+                    ),
         }
         self.source_aliases = {
             alias: source.name
@@ -54,30 +55,49 @@ class PropertyAlertManager:
         return self.source_aliases.get(source.lower())
 
     def get_property_url(self, property: dict) -> Optional[str]:
-        """Generate property URL based on source"""
-        source = property.get('source', '').lower()
-        source_id = property.get('source_id')
-        address = property.get('address', {}).get('display_address', '')
-        
-        logger.debug(f"URL Generation - Source: {source}, ID: {source_id}, Address: {address}")
-        
-        if not source or not source_id:
-            logger.debug("Missing source or source_id")
-            return None
+        """Get the correct URL for a property listing"""
+        try:
+            source = property.get('source', '').lower()
+            source_id = property.get('source_id')
             
-        source_obj = self.sources.get(source)
-        if not source_obj:
-            logger.debug(f"No source object found for {source}")
-            return None
+            if not source or not source_id:
+                return None
+                
+            # For property.ie, the source_id is already the complete URL
+            if source == 'property':
+                return source_id
+            elif source == 'daft':
+                address = property.get('address', {}).get('display_address', '')
+                slug = address.lower().replace(' ', '-').replace(',', '')
+                return self.sources['daft'].url_pattern.format(slug, source_id)
+            elif source == 'myhome':
+                # Get the SEO URL from the property data
+                seo_address = property.get('seo_url', '') or \
+                             property.get('address', {}).get('seo_address', '') or \
+                             self.create_seo_address(property)
+                return self.sources['myhome'].url_pattern.format(seo_address, source_id)
             
-        if source == 'daft':
-            # Create URL-friendly slug from address
-            slug = address.lower().replace(' ', '-').replace(',', '')
-            return source_obj.url_pattern.format(slug, source_id)
-        else:
-            url = source_obj.url_pattern.format(source_id)
-            logger.debug(f"Generated URL: {url}")
-            return url
+            return None
+        except Exception as e:
+            logger.error(f"Error generating property URL: {str(e)}")
+            return None
+
+    def create_seo_address(self, property: dict) -> str:
+        """Create a SEO-friendly address slug if not provided"""
+        try:
+            address = property.get('address', {}).get('display_address', '')
+            if not address:
+                return ''
+            
+            # Convert to lowercase and replace spaces/special chars with hyphens
+            seo_address = address.lower()
+            seo_address = re.sub(r'[^a-z0-9]+', '-', seo_address)
+            seo_address = seo_address.strip('-')
+            
+            return seo_address
+        except Exception as e:
+            logger.error(f"Error creating SEO address: {str(e)}")
+            return ''
 
     def format_address(self, property: dict) -> str:
         """Format address with area and county if available"""

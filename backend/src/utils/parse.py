@@ -119,6 +119,7 @@ class AsyncParser:
                 if isinstance(selector_info, dict):
                     selector = selector_info.get('selector', '')
                     attribute = selector_info.get('attribute', 'text')
+                    transform = selector_info.get('transform')
                     
                     element = parent.css_first(selector)
                     if element:
