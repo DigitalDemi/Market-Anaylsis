@@ -437,106 +437,127 @@ fn parse_myhome_row(row: &parquet::record::Row) -> Option<StandardizedProperty> 
     })
 }
 
+use serde_json::Value;
+use chrono::{DateTime, Utc};
+
 fn parse_daft_row(row: &parquet::record::Row) -> Option<StandardizedProperty> {
+    debug!("Starting to parse Daft row");
+
     let listing = match row.get_group(0) {
-        Ok(l) => l,
+        Ok(l) => {
+            debug!("Successfully got listing group");
+            l
+        },
         Err(e) => {
-            error!("Error getting listing group: {}", e);
+            error!("Failed to get listing group: {}", e);
             return None;
         }
     };
 
-    const PRICE_IDX: usize = 0;        // abbreviatedPrice
-    const BER_GROUP_IDX: usize = 1;    // ber group
-    const CATEGORY_IDX: usize = 2;     // category
-    const ID_IDX: usize = 7;           // id
-    const MEDIA_GROUP_IDX: usize = 8;  // media group
-    const BATHROOMS_IDX: usize = 9;    // numBathrooms
-    const BEDROOMS_IDX: usize = 10;    // numBedrooms
-    const ADDRESS_IDX: usize = 11;     // address
+    // First, let's debug the structure
+    debug!("Listing field count: {}", listing.len());
+    debug!("Listing fields: {:?}", listing);
 
-    let id = match listing.get_long(ID_IDX) {
-        Ok(id) => id.to_string(),
+    // Get abbreviatedPrice (index 0)
+    let price_string = match listing.get_string(0) {
+        Ok(price) => {
+            debug!("Found price string: {}", price);
+            price.to_string()
+        },
         Err(e) => {
-            error!("Error getting ID: {}", e);
+            error!("Failed to get price string: {}", e);
             return None;
         }
     };
 
-    let price_str = listing.get_string(PRICE_IDX).map_or("€0".to_string(), |s| s.to_string());
-    let price_amount = price_str
-        .trim_start_matches('€')
-        .trim_end_matches(" per month")
-        .split(|c: char| !c.is_digit(10) && c != ',' && c != '.')
-        .next()
-        .map(|s| s.replace(",", ""))
-        .and_then(|s| s.parse::<f64>().ok())
-        .unwrap_or(0.0);
+    let price_amount = match parse_price_string(&price_string) {
+        Some(amount) => amount,
+        None => return None,
+    };
 
-    let ber_rating = listing
-        .get_group(BER_GROUP_IDX)
-        .ok()
-        .and_then(|ber| ber.get_string(2).ok())
-        .map(String::from);
+    // Get PropertyId (index 3)
+    let property_id = match listing.get_string(3) {
+        Ok(id) => {
+            debug!("Found property ID: {}", id);
+            id.to_string()
+        },
+        Err(e) => {
+            error!("Failed to get property ID: {}", e);
+            return None;
+        }
+    };
 
-    let bedrooms = listing
-        .get_string(BEDROOMS_IDX)
-        .ok()
-        .and_then(|beds| {
-            beds.chars()
-                .filter(|c| c.is_digit(10))
-                .collect::<String>()
-                .parse::<i32>()
-                .ok()
-        });
+    // Get DisplayAddress (using seoTitle or title, likely index 5)
+    let display_address = match listing.get_string(5) {
+        Ok(addr) => {
+            debug!("Found display address: {}", addr);
+            addr.to_string()
+        },
+        Err(e) => {
+            debug!("Failed to get display address: {}", e);
+            "Address not available".to_string()
+        }
+    };
 
-    let bathrooms = listing
-        .get_string(BATHROOMS_IDX)
-        .ok()
-        .and_then(|baths| {
-            baths.chars()
-                .filter(|c| c.is_digit(10))
-                .collect::<String>()
-                .parse::<i32>()
-                .ok()
-        });
+    // Get PropertyType (likely index 2)
+    let property_type = match listing.get_string(2) {
+        Ok(pt) => {
+            debug!("Found property type: {}", pt);
+            pt.to_string()
+        },
+        Err(e) => {
+            debug!("Failed to get property type: {}", e);
+            "Not specified".to_string()
+        }
+    };
 
-    let property_type = listing
-        .get_string(CATEGORY_IDX)
-        .map_or("Not specified".to_string(), |s| s.to_string());
-
-    let has_video = listing
-        .get_group(MEDIA_GROUP_IDX)
-        .ok()
-        .and_then(|media| media.get_bool(2).ok())
-        .unwrap_or(false);
-
-    let display_address = listing
-        .get_string(ADDRESS_IDX)
-        .map_or("Address not specified".to_string(), |s| s.to_string());
-
-    let photos = match listing.get_group(MEDIA_GROUP_IDX) {
-        Ok(media) => {
-            let mut photos_vec = Vec::new();
-            if let Ok(photo_urls) = media.get_list(0) {
-                for i in 0..photo_urls.len() {
-                    if let Ok(url) = photo_urls.get_string(i) {
-                        photos_vec.push(Photo {
-                            url: url.to_string(),
-                            is_main: i == 0,
-                        });
-                    }
-                }
+    // Get seoFriendlyPath (index 23 in the listing struct)
+    let seo_url = match listing.get_string(23) {
+        Ok(path) => {
+            debug!("Found SEO path: {}", path);
+            Some(path.to_string())
+        },
+        Err(e) => {
+            debug!("Failed to get SEO friendly path: {}", e);
+            // Fallback to brochure url from media if available
+            match listing.get_group(8)  // media
+                .and_then(|media| media.get_group(0))  // brochure
+                .and_then(|brochure_list| brochure_list.get_group(0))  // first brochure
+                .and_then(|brochure| brochure.get_string(0)) { // url
+                Ok(url) => Some(url.to_string()),
+                Err(_) => None,
             }
-            photos_vec
         }
-        Err(_) => Vec::new(),
     };
 
+    // Get BER rating from the nested BER struct (index 1)
+    let ber_rating = if let Ok(ber_group) = listing.get_group(1) {
+        match ber_group.get_string(2) { // rating field
+            Ok(rating) => Some(rating.to_string()),
+            Err(_) => None,
+        }
+    } else {
+        None
+    };
+
+    let brochure_url = match listing.get_group(8)  // media at index 8
+    .and_then(|media| media.get_group(0))  // brochure at index 0
+    .and_then(|brochure_list| brochure_list.get_group(0))  // first brochure
+    .and_then(|brochure| brochure.get_string(0)) {  // url at index 0
+        Ok(url) => Some(url.to_string()),
+        Err(_) => None,
+    };
+
+
+    // For bedrooms and bathrooms, we'll rely on the property_type string parsing for now
+    let bedrooms = None;  // We'll implement proper parsing later
+    let bathrooms = None; // We'll implement proper parsing later
+
+    // For now, we'll return a simplified property structure
     Some(StandardizedProperty {
-        property_id: format!("daft_{}", id),
+        property_id: format!("daft_{}", property_id),
         source: "daft".to_string(),
-        source_id: id,
+        source_id: property_id,
         address: Address {
             display_address,
         },
@@ -551,14 +572,14 @@ fn parse_daft_row(row: &parquet::record::Row) -> Option<StandardizedProperty> {
             frequency: Some("month".to_string()),
             price_changes: vec![],
         },
-        created_date: chrono::Local::now().to_rfc3339(),
-        updated_date: chrono::Local::now().to_rfc3339(),
+        created_date: chrono::Utc::now().to_rfc3339(),
+        updated_date: chrono::Utc::now().to_rfc3339(),
         listing_type: "rent".to_string(),
         status: "active".to_string(),
-        photos,
-        has_video,
-        agent: None,
-        seo_url: None,
+        photos: vec![], // We'll implement photo parsing later
+        has_video: false,
+        agent: None,    // We'll implement agent parsing later
+        seo_url
     })
 }
 
@@ -582,6 +603,7 @@ async fn debug_paths() -> String {
     )
 }
 
+
 async fn search_rentals(Query(params): Query<SearchParams>) -> Json<Vec<StandardizedProperty>> {
     let mut properties = Vec::new();
     let sources = match &params.source {
@@ -602,67 +624,92 @@ async fn search_rentals(Query(params): Query<SearchParams>) -> Json<Vec<Standard
             }
         }
 
+        debug!("Processing source: {}", source);
+        
         if let Some(latest_file) = find_latest_parquet(source, data_path) {
-            debug!("Processing file for source {}: {:?}", source, latest_file);
+            debug!("Found latest file for {}: {:?}", source, latest_file);
 
-            if let Ok(file) = File::open(&latest_file) {
-                if let Ok(reader) = SerializedFileReader::new(file) {
-                    if let Ok(iter) = reader.get_row_iter(None) {
-                        for row_result in iter {
-                            match row_result {
-                                Ok(row) => {
-                                    let property = match source {
-                                        "property" => {
-                                            let address = row
-                                                .get_string(0)
-                                                .map(|s| s.to_string())
-                                                .unwrap_or_default();
-                                            let price_string = row
-                                                .get_string(1)
-                                                .map(|s| s.to_string())
-                                                .unwrap_or_default();
-                                            let id = row
-                                                .get_string(2)
-                                                .map(|s| s.to_string())
-                                                .unwrap_or_default();
+            match File::open(&latest_file) {
+                Ok(file) => {
+                    match SerializedFileReader::new(file) {
+                        Ok(reader) => {
+                            match reader.get_row_iter(None) {
+                                Ok(iter) => {
+                                    for row_result in iter {
+                                        match row_result {
+                                            Ok(row) => {
+                                                let property = match source {
+                                                    "daft" => {
+                                                        debug!("Parsing Daft row");
+                                                        match parse_daft_row(&row) {
+                                                            Some(p) => {
+                                                                debug!("Successfully parsed Daft property: {} - {}", 
+                                                                    p.property_id, p.price.amount);
+                                                                p
+                                                            },
+                                                            None => {
+                                                                debug!("Failed to parse Daft property");
+                                                                continue;
+                                                            }
+                                                        }
+                                                    },
+                                                    "myhome" => {
+                                                        match parse_myhome_row(&row) {
+                                                            Some(p) => p,
+                                                            None => continue,
+                                                        }
+                                                    },
+                                                    "property" => {
+                                                        let address = row
+                                                            .get_string(0)
+                                                            .map(|s| s.to_string())
+                                                            .unwrap_or_default();
+                                                        let price_string = row
+                                                            .get_string(1)
+                                                            .map(|s| s.to_string())
+                                                            .unwrap_or_default();
+                                                        let id = row
+                                                            .get_string(2)
+                                                            .map(|s| s.to_string())
+                                                            .unwrap_or_default();
 
-                                            StandardizedProperty::from_property_ie(PropertyIEListing {
-                                                address,
-                                                price: price_string,
-                                                id,
-                                            })
-                                        },
-                                        "myhome" => match parse_myhome_row(&row) {
-                                            Some(property) => property,
-                                            None => continue,
-                                        },
-                                        "daft" => match parse_daft_row(&row) {
-                                            Some(property) => property,
-                                            None => continue,
-                                        },
-                                        _ => continue,
-                                    };
+                                                        StandardizedProperty::from_property_ie(PropertyIEListing {
+                                                            address,
+                                                            price: price_string,
+                                                            id,
+                                                        })
+                                                    },
+                                                    _ => continue,
+                                                };
 
-                                    // Validate the price before including the property
-                                    if !validate_price(property.price.amount) {
-                                        warn!("Invalid price {} for property {}", property.price.amount, property.property_id);
-                                        continue;
-                                    }
+                                                // Validate the price before including the property
+                                                if !validate_price(property.price.amount) {
+                                                    debug!("Invalid price {} for property {}", 
+                                                        property.price.amount, property.property_id);
+                                                    continue;
+                                                }
 
-                                    // Apply filters using a separate function for clarity
-                                    if should_include_property(&property, &params) {
-                                        debug!(
-                                            "Adding property: {} - {} from source {}",
-                                            property.property_id, property.address.display_address, source
-                                        );
-                                        properties.push(property);
+                                                // Apply filters
+                                                if should_include_property(&property, &params) {
+                                                    debug!("Adding property {} with price {}", 
+                                                        property.property_id, property.price.amount);
+                                                    properties.push(property);
+                                                } else {
+                                                    debug!("Property {} filtered out by criteria", 
+                                                        property.property_id);
+                                                }
+                                            }
+                                            Err(e) => error!("Error reading row: {}", e),
+                                        }
                                     }
                                 }
-                                Err(e) => error!("Error reading row: {}", e),
+                                Err(e) => error!("Error getting row iterator: {}", e),
                             }
                         }
+                        Err(e) => error!("Error creating reader for {}: {}", source, e),
                     }
                 }
+                Err(e) => error!("Error opening file for {}: {}", source, e),
             }
         } else {
             warn!("No parquet file found for source: {}", source);
@@ -673,16 +720,21 @@ async fn search_rentals(Query(params): Query<SearchParams>) -> Json<Vec<Standard
     Json(properties)
 }
 
-// Helper function to determine if a property matches all filter criteria
 fn should_include_property(property: &StandardizedProperty, params: &SearchParams) -> bool {
+    debug!("Checking property {} against filters", property.property_id);
+    
     // Price filters
     if let Some(min_price) = params.min_price {
         if property.price.amount < min_price {
+            debug!("Property {} filtered out by min price: {} < {}", 
+                property.property_id, property.price.amount, min_price);
             return false;
         }
     }
     if let Some(max_price) = params.max_price {
         if property.price.amount > max_price {
+            debug!("Property {} filtered out by max price: {} > {}", 
+                property.property_id, property.price.amount, max_price);
             return false;
         }
     }
@@ -691,9 +743,12 @@ fn should_include_property(property: &StandardizedProperty, params: &SearchParam
     if let Some(bedrooms) = params.bedrooms {
         if let Some(prop_beds) = property.bedrooms {
             if prop_beds != bedrooms {
+                debug!("Property {} filtered out by bedrooms: {} != {}", 
+                    property.property_id, prop_beds, bedrooms);
                 return false;
             }
         } else {
+            debug!("Property {} filtered out: no bedroom info", property.property_id);
             return false;
         }
     }
@@ -703,6 +758,8 @@ fn should_include_property(property: &StandardizedProperty, params: &SearchParam
         if !property.property_type
             .to_lowercase()
             .contains(&prop_type.to_lowercase()) {
+            debug!("Property {} filtered out by type: {} doesn't contain {}", 
+                property.property_id, property.property_type, prop_type);
             return false;
         }
     }
@@ -711,16 +768,19 @@ fn should_include_property(property: &StandardizedProperty, params: &SearchParam
     if let Some(ref ber) = params.ber_rating {
         if let Some(ref property_ber) = property.ber_rating {
             if !property_ber.to_lowercase().contains(&ber.to_lowercase()) {
+                debug!("Property {} filtered out by BER: {} doesn't match {}", 
+                    property.property_id, property_ber, ber);
                 return false;
             }
         } else {
+            debug!("Property {} filtered out: no BER info", property.property_id);
             return false;
         }
     }
 
+    debug!("Property {} passed all filters", property.property_id);
     true
 }
-
 
 #[cfg(test)]
 mod tests {

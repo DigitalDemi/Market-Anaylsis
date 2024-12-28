@@ -25,7 +25,7 @@ class PropertyAlertManager:
                     display_name='Daft.ie',
                     aliases=['daft', 'daft.ie', 'daftie'],
                     base_url='https://www.daft.ie',
-                    url_pattern='https://www.daft.ie/for-rent/{}/{}',
+                    url_pattern='{}/{}',
                     ),
                 'myhome': PropertySource(
                 name='myhome',
@@ -66,10 +66,13 @@ class PropertyAlertManager:
             # For property.ie, the source_id is already the complete URL
             if source == 'property':
                 return source_id
-            elif source == 'daft':
-                address = property.get('address', {}).get('display_address', '')
-                slug = address.lower().replace(' ', '-').replace(',', '')
-                return self.sources['daft'].url_pattern.format(slug, source_id)
+
+            if source == 'daft':
+            # Use the seo_url directly if available
+                if property.get('seo_url'):
+                    logging.info( f"{self.sources['daft'].base_url}{property['seo_url']}")
+                    return f"{self.sources['daft'].base_url}{property['seo_url']}"
+                return None
             elif source == 'myhome':
                 # Get the SEO URL from the property data
                 seo_address = property.get('seo_url', '') or \
