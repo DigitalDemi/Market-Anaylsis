@@ -4,7 +4,6 @@ use parquet::record::{RowAccessor, ListAccessor};
 use serde::{Deserialize, Serialize};
 use std::fs::{self, File};
 use std::{env, path::{Path, PathBuf}};
-use tracing_subscriber;
 use log::{error, warn, debug};
 
 // Type definitions for standardized properties
@@ -116,7 +115,7 @@ impl StandardizedProperty {
             .price
             .trim_start_matches('€')
             .trim_end_matches(" monthly")
-            .split(|c: char| !c.is_digit(10) && c != ',' && c != '.')
+            .split(|c: char| !c.is_ascii_digit() && c != ',' && c != '.')
             .next()
             .and_then(|s| s.replace(",", "").trim().parse::<f64>().ok())
             .unwrap_or(0.0);
@@ -150,56 +149,6 @@ impl StandardizedProperty {
         }
     }
 
-    fn from_myhome(raw: MyHomeProperty) -> Self {
-        let price_amount = raw
-            .price_as_string
-            .trim_start_matches('€')
-            .trim()
-            .split(|c: char| !c.is_digit(10) && c != ',' && c != '.')
-            .next()
-            .map(|s| s.replace(",", ""))
-            .and_then(|s| s.parse::<f64>().ok())
-            .unwrap_or(0.0);
-
-        StandardizedProperty {
-            property_id: format!("myhome_{}", raw.property_id),
-            source: "myhome".to_string(),
-            source_id: raw.property_id.to_string(),
-            address: Address {
-                display_address: raw.display_address.trim().to_string(),
-            },
-            property_type: raw.property_type,
-            bedrooms: raw.number_of_beds,
-            bathrooms: Some(raw.number_of_bathrooms),
-            size: raw.size_string_meters.map(|v| Size {
-                value: v,
-                unit: "square_meters".to_string(),
-            }),
-            ber_rating: raw.ber_rating.filter(|s| !s.is_empty()),
-            price: Price {
-                amount: price_amount,
-                currency: "EUR".to_string(),
-                frequency: Some("month".to_string()),
-                price_changes: vec![],
-            },
-            created_date: raw.created_on_date,
-            updated_date: raw.refreshed_on,
-            listing_type: "rent".to_string(),
-            status: if raw.is_active { "active" } else { "inactive" }.to_string(),
-            photos: vec![Photo {
-                url: raw.main_photo,
-                is_main: true,
-            }],
-            has_video: raw.has_videos,
-            agent: Some(Agent {
-                name: raw.group_name,
-                phone: raw.group_phone_number,
-                email: raw.group_email,
-                address: raw.group_address,
-            }),
-            seo_url: None
-        }
-    }
 }
 
 fn find_latest_parquet(source: &str, base_path: &str) -> Option<PathBuf> {
@@ -254,7 +203,7 @@ fn find_latest_parquet(source: &str, base_path: &str) -> Option<PathBuf> {
         .ok()?
         .filter_map(|entry| entry.ok().map(|e| e.path()))
         .filter(|path| path.extension().map_or(false, |ext| ext == "parquet"))
-        .max_by_key(|path| path.metadata().ok().map(|m| m.modified().ok()).flatten())
+        .max_by_key(|path| path.metadata().ok().and_then(|m| m.modified().ok()))
 }
 
 fn parse_price_string(price_str: &str) -> Option<f64> {
@@ -282,7 +231,7 @@ fn parse_price_string(price_str: &str) -> Option<f64> {
     // Extract only numeric characters and decimal points
     let numeric_str: String = price_part
         .chars()
-        .filter(|c| c.is_digit(10) || *c == '.')
+        .filter(|c| c.is_ascii_digit() || *c == '.')
         .collect();
 
     if numeric_str.is_empty() {
@@ -437,8 +386,6 @@ fn parse_myhome_row(row: &parquet::record::Row) -> Option<StandardizedProperty> 
     })
 }
 
-use serde_json::Value;
-use chrono::{DateTime, Utc};
 
 fn parse_daft_row(row: &parquet::record::Row) -> Option<StandardizedProperty> {
     debug!("Starting to parse Daft row");
@@ -538,14 +485,6 @@ fn parse_daft_row(row: &parquet::record::Row) -> Option<StandardizedProperty> {
         }
     } else {
         None
-    };
-
-    let brochure_url = match listing.get_group(8)  // media at index 8
-    .and_then(|media| media.get_group(0))  // brochure at index 0
-    .and_then(|brochure_list| brochure_list.get_group(0))  // first brochure
-    .and_then(|brochure| brochure.get_string(0)) {  // url at index 0
-        Ok(url) => Some(url.to_string()),
-        Err(_) => None,
     };
 
 
@@ -782,6 +721,29 @@ fn should_include_property(property: &StandardizedProperty, params: &SearchParam
     true
 }
 
+
+#[tokio::main]
+async fn main() {
+    // Initialize logging
+    tracing_subscriber::fmt::init();
+
+    // Setup router with all our endpoints
+    let app = Router::new()
+        .route("/health", get(health_check))
+        .route("/api/rentals/search", get(search_rentals))
+        .route("/debug/paths", get(debug_paths));
+
+    // Start the server
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+    println!("Server listening on {}", listener.local_addr().unwrap());
+    
+    // Start serving
+    axum::serve(listener, app)
+        .await
+        .unwrap();
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -823,25 +785,3 @@ mod tests {
 }
 
 
-#[tokio::main]
-async fn main() {
-    // Initialize logging
-    tracing_subscriber::fmt::init();
-
-    // Setup router with all our endpoints
-    let app = Router::new()
-        .route("/health", get(health_check))
-        .route("/api/rentals/search", get(search_rentals))
-        .route("/debug/paths", get(debug_paths));
-
-    // Start the server
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        .await
-        .unwrap();
-    println!("Server listening on {}", listener.local_addr().unwrap());
-    
-    // Start serving
-    axum::serve(listener, app)
-        .await
-        .unwrap();
-}
